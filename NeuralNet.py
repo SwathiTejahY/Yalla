@@ -45,10 +45,17 @@ for i in range(INPUT_SIZE):
 
 # Predict button
 if st.button("Predict"):
-    input_data = np.array(input_features).reshape(1, -1)
-    prediction = predict(input_data)
-    st.write("Prediction:", prediction)
+    try:
+        input_data = np.array(input_features).reshape(1, -1)
+        prediction = predict(input_data)
+        st.write("Prediction:", prediction)
+    except Exception as e:
+        st.error(f"An error occurred during prediction: {e}")
 
 # Display model architecture
 if st.checkbox("Show Model Architecture"):
     st.write(model)
+
+# Debugging Info (optional)
+if st.checkbox("Show Debug Info"):
+    st.write("Input Features:", input_features)
