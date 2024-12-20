@@ -1,0 +1,65 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyPCPZWKgLqDz0oS2BYgxGLk",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/SwathiTejahY/Yalla/blob/main/create_dataset.pth\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 1,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "ZlpOGd0eZfqp",
+        "outputId": "d53995bb-0d0d-45e1-9972-abc6761babb3"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Corrected dataset saved as 'corrected_dataset.pth'\n"
+          ]
+        }
+      ],
+      "source": [
+        "import torch\n",
+        "import numpy as np\n",
+        "\n",
+        "# Generate dummy dataset\n",
+        "X_dummy = np.random.rand(100, 10).astype(np.float32)  # 100 samples, 10 features each\n",
+        "y_dummy = np.random.randint(0, 5, size=(100,)).astype(np.int64)  # 100 labels (0-4 classes)\n",
+        "\n",
+        "# Correct dataset structure\n",
+        "corrected_data = {\"X\": X_dummy, \"y\": y_dummy}\n",
+        "\n",
+        "# Save the corrected file\n",
+        "torch.save(corrected_data, \"corrected_dataset.pth\")\n",
+        "print(\"Corrected dataset saved as 'corrected_dataset.pth'\")\n"
+      ]
+    }
+  ]
+}
