@@ -257,12 +257,12 @@ results.append(evaluate_model("Linear Discriminant Analysis", y_test, y_pred_lda
 
 
 print("Starting Convolutional Neural Network")
-c# Removed keras add layers; using MLPClassifier instead(Conv1D(filters=64, kernel_size=2, activation='relu', input_shape=(x_train.shape[1], 1)))
-c# Removed keras add layers; using MLPClassifier instead(MaxPooling1D(pool_size=2))
-c# Removed keras add layers; using MLPClassifier instead(Flatten())
-c# Removed keras add layers; using MLPClassifier instead(Dense(50, activation='relu'))
-c# Removed keras add layers; using MLPClassifier instead(Dense(6, activation='softmax'))
-c# Removed keras compile for sklearn MLPClassifierloss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+## Removed keras add layers; using MLPClassifier instead(Conv1D(filters=64, kernel_size=2, activation='relu', input_shape=(x_train.shape[1], 1)))
+## Removed keras add layers; using MLPClassifier instead(MaxPooling1D(pool_size=2))
+## Removed keras add layers; using MLPClassifier instead(Flatten())
+## Removed keras add layers; using MLPClassifier instead(Dense(50, activation='relu'))
+## Removed keras add layers; using MLPClassifier instead(Dense(6, activation='softmax'))
+## Removed keras compile for sklearn MLPClassifierloss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
 
 # In[ ]:
