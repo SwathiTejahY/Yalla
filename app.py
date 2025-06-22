@@ -174,7 +174,7 @@ y_pred_nn, nn_train_time, nn_test_time = measure_time(nn_model, x_train, y_train
 import numpy as np
 
 # Evaluate and append results
-results.append(evaluate_model("Neural Network", y_test, y_pred_nn_classes, nn_train_time, nn_test_time))
+results.append(evaluate_model("Neural Network", y_test, y_pred_nn, nn_train_time, nn_test_time))
 
 
 
