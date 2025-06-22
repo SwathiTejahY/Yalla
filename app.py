@@ -13,9 +13,6 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.metrics import confusion_matrix, accuracy_score, f1_score
 from sklearn.utils import shuffle
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Conv1D, MaxPooling1D, Flatten, LSTM
-from tensorflow.keras.callbacks import EarlyStopping
 from sklearn.exceptions import ConvergenceWarning
 import warnings
 import matplotlib.pyplot as plt
@@ -139,7 +136,6 @@ results = []
 
 
 print("Starting Neural Network")
-nn_model = Sequential()
 nn_model.add(Dense(50, input_dim=x_train.shape[1], kernel_initializer='normal', activation='relu'))
 nn_model.add(Dense(30, activation='relu'))
 nn_model.add(Dense(20, kernel_initializer='normal', activation='relu'))
@@ -248,7 +244,6 @@ results.append(evaluate_model("Linear Discriminant Analysis", y_test, y_pred_lda
 
 
 print("Starting Convolutional Neural Network")
-cnn_model = Sequential()
 cnn_model.add(Conv1D(filters=64, kernel_size=2, activation='relu', input_shape=(x_train.shape[1], 1)))
 cnn_model.add(MaxPooling1D(pool_size=2))
 cnn_model.add(Flatten())
@@ -270,10 +265,6 @@ cnn_history = cnn_model.fit(x_train_cnn, y_train, validation_data=(x_test_cnn, y
 
 import numpy as np
 import time
-from tensorflow.keras.datasets import mnist
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
-from tensorflow.keras.utils import to_categorical
 from sklearn.metrics import accuracy_score
 
 # Step 1: Load and preprocess data
@@ -291,7 +282,6 @@ y_test_cat = to_categorical(y_test, 10)
 
 # Step 2: Define CNN model
 def cnn_model():
-    model = Sequential()
     model.add(Conv2D(32, kernel_size=(3, 3), activation="relu", input_shape=(28, 28, 1)))
     model.add(MaxPooling2D(pool_size=(2, 2)))
     model.add(Flatten())
@@ -318,9 +308,6 @@ def measure_time(model_func, x_train, y_train, x_test, y_test):
 
 import numpy as np
 import time
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv1D, MaxPooling1D, LSTM, Dense
-from tensorflow.keras.datasets import mnist
 from sklearn.metrics import accuracy_score
 
 # Step 1: Load and preprocess the MNIST data
@@ -332,9 +319,6 @@ x_test = x_test.astype("float32") / 255.0
 x_train_slstm = x_train.reshape(-1, 28, 28)  # 28 time steps, 28 features each
 x_test_slstm = x_test.reshape(-1, 28, 28)
 
-# Step 3: Define the SLSTM model
-print("Starting SLSTM")
-slstm_model = Sequential()
 slstm_model.add(Conv1D(filters=64, kernel_size=2, activation='relu', input_shape=(28, 28)))
 slstm_model.add(MaxPooling1D(pool_size=2))
 slstm_model.add(LSTM(50, return_sequences=True))
@@ -357,7 +341,6 @@ y_pred_slstm = np.argmax(y_pred_probs, axis=1)
 
 # Step 6: Evaluate performance
 acc = accuracy_score(y_test, y_pred_slstm)
-print(f"\nSLSTM Accuracy: {acc:.4f}")
 print(f"Training Time: {end_train - start_train:.2f} seconds")
 print(f"Testing Time: {end_test - start_test:.2f} seconds")
 
@@ -373,9 +356,6 @@ slstm_history = slstm_model.fit(x_train_cnn, y_train, validation_data=(x_test_cn
 
 import numpy as np
 import time
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv1D, MaxPooling1D, LSTM, Dense
-from tensorflow.keras.datasets import mnist
 from sklearn.metrics import accuracy_score
 
 # Step 1: Load and preprocess MNIST data
@@ -383,9 +363,7 @@ from sklearn.metrics import accuracy_score
 x_train = x_train.astype("float32") / 255.0
 x_test = x_test.astype("float32") / 255.0
 
-# Step 2: Define SLSTM model builder
 def slstm_model():
-    model = Sequential()
     model.add(Conv1D(filters=64, kernel_size=2, activation='relu', input_shape=(28, 28)))
     model.add(MaxPooling1D(pool_size=2))
     model.add(LSTM(50, return_sequences=True))
@@ -429,7 +407,6 @@ def evaluate_model(name, y_true, y_pred, train_time, test_time):
         "Test Time (s)": test_time
     }
 
-# Step 5: Run SLSTM
 results = []
 
 y_pred_slstm, slstm_train_time, slstm_test_time = measure_time(
@@ -437,7 +414,6 @@ y_pred_slstm, slstm_train_time, slstm_test_time = measure_time(
 )
 
 results.append(
-    evaluate_model("SLSTM", y_test, y_pred_slstm, slstm_train_time, slstm_test_time)
 )
 
 
@@ -469,4 +445,5 @@ plt.xticks(rotation=45)
 
 plt.tight_layout()
 plt.show()
+
 
