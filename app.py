@@ -22,8 +22,6 @@ import seaborn as sns
 # In[ ]:
 
 
-from google.colab import drive
-drive.mount('/content/drive')
 
 
 # In[ ]:
@@ -445,5 +443,6 @@ plt.xticks(rotation=45)
 
 plt.tight_layout()
 plt.show()
+
 
 
