@@ -144,8 +144,9 @@ print("Starting Neural Network")
 # In[ ]:
 
 
-monitor = EarlyStopping(monitor='val_loss', min_delta=1e-3, patience=5, verbose=1, mode='auto')
-history = nn_model.fit(x_train, y_train, validation_data=(x_test, y_test), callbacks=[monitor], verbose=2, epochs=200, batch_size=1000)
+monitor = # Removed EarlyStopping (Keras-specific)
+# monitor='val_loss', min_delta=1e-3, patience=5, verbose=1, mode='auto')
+history = nn_model.fit(x_train, y_train, validation_data=(x_test, y_test),  verbose=2, epochs=200, batch_size=1000)
 
 
 # In[ ]:
@@ -255,7 +256,7 @@ c# Removed keras compile for sklearn MLPClassifierloss='sparse_categorical_cross
 
 x_train_cnn = x_train.reshape((x_train.shape[0], x_train.shape[1], 1))
 x_test_cnn = x_test.reshape((x_test.shape[0], x_test.shape[1], 1))
-cnn_history = cnn_model.fit(x_train_cnn, y_train, validation_data=(x_test_cnn, y_test), callbacks=[monitor], verbose=2, epochs=200, batch_size=1000)
+cnn_history = cnn_model.fit(x_train_cnn, y_train, validation_data=(x_test_cnn, y_test),  verbose=2, epochs=200, batch_size=1000)
 
 
 # In[2]:
@@ -346,7 +347,7 @@ print(f"Testing Time: {end_test - start_test:.2f} seconds")
 # In[ ]:
 
 
-slstm_history = slstm_model.fit(x_train_cnn, y_train, validation_data=(x_test_cnn, y_test), callbacks=[monitor], verbose=2, epochs=200, batch_size=1000)
+slstm_history = slstm_model.fit(x_train_cnn, y_train, validation_data=(x_test_cnn, y_test),  verbose=2, epochs=200, batch_size=1000)
 
 
 # In[7]:
