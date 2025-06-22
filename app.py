@@ -27,8 +27,8 @@ import seaborn as sns
 # In[ ]:
 
 
-dftrain = pd.read_csv("/content/drive/MyDrive/Colab Notebooks/train70_reduced.csv")
-dftest = pd.read_csv("/content/drive/MyDrive/Colab Notebooks/test30_reduced.csv")
+dftrain = pd.read_csv("train_small.csv")
+dftest = pd.read_csv("test_small.csv")
 
 
 # In[ ]:
@@ -443,6 +443,5 @@ plt.xticks(rotation=45)
 
 plt.tight_layout()
 plt.show()
-
 
 
