@@ -270,6 +270,10 @@ print("Starting Convolutional Neural Network")
 
 x_train_cnn = x_train.reshape((x_train.shape[0], x_train.shape[1], 1))
 x_test_cnn = x_test.reshape((x_test.shape[0], x_test.shape[1], 1))
+
+from sklearn.neural_network import MLPClassifier
+cnn_model = MLPClassifier(hidden_layer_sizes=(100,), max_iter=300, random_state=42)
+
 cnn_model.fit(x_train_cnn, y_train)
 
 
