@@ -270,7 +270,7 @@ print("Starting Convolutional Neural Network")
 
 x_train_cnn = x_train.reshape((x_train.shape[0], x_train.shape[1], 1))
 x_test_cnn = x_test.reshape((x_test.shape[0], x_test.shape[1], 1))
-cnn_history = cnn_model.fit(x_train_cnn, y_train, validation_data=(x_test_cnn, y_test),  verbose=2, epochs=200, batch_size=1000)
+cnn_model.fit(x_train_cnn, y_train)
 
 
 # In[2]:
