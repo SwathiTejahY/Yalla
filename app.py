@@ -16,13 +16,13 @@ from tensorflow.keras.callbacks import EarlyStopping
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-st.title("Fast Model Comparison App")
+st.title("Model Comparison App (Fast + Deep Learning Optional)")
 
 # ===================== Load & Preprocess =====================
 @st.cache_data
 def load_data():
-    dftrain = pd.read_csv("train70_reduced.csv")
-    dftest = pd.read_csv("test30_reduced.csv")
+    dftrain = pd.read_csv("train_small.csv")
+    dftest = pd.read_csv("test_small.csv")
 
     dftrain = dftrain.astype('category')
     dftest = dftest.astype('category')
@@ -89,21 +89,19 @@ with st.spinner("Running Decision Tree..."):
 with st.spinner("Running K-Nearest Neighbors..."):
     knn = KNeighborsClassifier(n_neighbors=5)
     y_pred, t_train, t_test = measure_time(knn, x_train, y_train, x_test, y_test)
-    results.append(evaluate_model("K-Nearest Neighbors", y_test, y_pred, t_train, t_test))
+    results.append(evaluate_model("KNN", y_test, y_pred, t_train, t_test))
 
-with st.spinner("Running Linear Discriminant Analysis..."):
+with st.spinner("Running LDA..."):
     lda = LinearDiscriminantAnalysis()
     y_pred, t_train, t_test = measure_time(lda, x_train, y_train, x_test, y_test)
     results.append(evaluate_model("LDA", y_test, y_pred, t_train, t_test))
 
 # ===================== Deep Learning (Optional) =====================
 st.subheader("Deep Learning Models (Optional)")
-run_dl = st.checkbox("Run Deep Learning Models (Slow)", value=False)
+run_dl = st.checkbox("Run Deep Learning Models (slower)", value=False)
 
 if run_dl:
     monitor = EarlyStopping(monitor='val_loss', patience=3, verbose=0)
-
-    # Use subset for validation to reduce load
     x_val = x_test[:300]
     y_val = y_test[:300]
 
@@ -115,5 +113,53 @@ if run_dl:
             Dense(6, activation='softmax')
         ])
         nn_model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-        nn_model.fit(x_train, y_train, validation_data=(x_val, y_val), callbacks=[monitor]
+        nn_model.fit(x_train, y_train, validation_data=(x_val, y_val), callbacks=[monitor], epochs=10, batch_size=64, verbose=0)
+        y_pred, t_train, t_test = measure_time(nn_model, x_train, y_train, x_test, y_test)
+        results.append(evaluate_model("Neural Network", y_test, y_pred, t_train, t_test))
+
+    with st.spinner("Training CNN..."):
+        cnn_model = Sequential([
+            Conv1D(64, 2, activation='relu', input_shape=(x_train.shape[1], 1)),
+            MaxPooling1D(2),
+            Flatten(),
+            Dense(50, activation='relu'),
+            Dense(6, activation='softmax')
+        ])
+        cnn_model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+        cnn_model.fit(x_train.reshape((-1, x_train.shape[1], 1)), y_train,
+                      validation_data=(x_val.reshape((-1, x_val.shape[1], 1)), y_val),
+                      callbacks=[monitor], epochs=10, batch_size=64, verbose=0)
+        y_pred, t_train, t_test = measure_time(cnn_model, x_train, y_train, x_test, y_test, reshape=True)
+        results.append(evaluate_model("CNN", y_test, y_pred, t_train, t_test))
+
+    with st.spinner("Training SLSTM..."):
+        slstm_model = Sequential([
+            Conv1D(64, 2, activation='relu', input_shape=(x_train.shape[1], 1)),
+            MaxPooling1D(2),
+            LSTM(50, return_sequences=True),
+            LSTM(50),
+            Dense(6, activation='softmax')
+        ])
+        slstm_model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+        slstm_model.fit(x_train.reshape((-1, x_train.shape[1], 1)), y_train,
+                        validation_data=(x_val.reshape((-1, x_val.shape[1], 1)), y_val),
+                        callbacks=[monitor], epochs=10, batch_size=64, verbose=0)
+        y_pred, t_train, t_test = measure_time(slstm_model, x_train, y_train, x_test, y_test, reshape=True)
+        results.append(evaluate_model("SLSTM", y_test, y_pred, t_train, t_test))
+
+# ===================== Show Results =====================
+st.subheader("Model Performance Summary")
+results_df = pd.DataFrame(results)
+st.dataframe(results_df)
+
+fig, ax = plt.subplots(1, 2, figsize=(14, 5))
+sns.barplot(x="Model", y="Accuracy", data=results_df, ax=ax[0])
+ax[0].set_title("Model Accuracy")
+ax[0].tick_params(axis='x', rotation=45)
+
+sns.barplot(x="Model", y="F1 Score", data=results_df, ax=ax[1])
+ax[1].set_title("Model F1 Score")
+ax[1].tick_params(axis='x', rotation=45)
+
+st.pyplot(fig)
 
