@@ -172,7 +172,6 @@ y_pred_nn, nn_train_time, nn_test_time = measure_time(nn_model, x_train, y_train
 
 # Convert probabilities to class predictions
 import numpy as np
-y_pred_nn_classes = np.argmax(y_pred_nn, axis=1)
 
 # Evaluate and append results
 results.append(evaluate_model("Neural Network", y_test, y_pred_nn_classes, nn_train_time, nn_test_time))
@@ -351,7 +350,6 @@ start_test = time.time()
 y_pred_probs = slstm_model.predict(x_test_slstm)
 end_test = time.time()
 
-y_pred_slstm = np.argmax(y_pred_probs, axis=1)
 
 # Step 6: Evaluate performance
 acc = accuracy_score(y_test, y_pred_slstm)
@@ -402,7 +400,6 @@ def measure_time(model_func, x_train, y_train, x_test, y_test, reshape=False):
     y_pred_probs = model.predict(x_test)
     end_test = time.time()
 
-    y_pred = np.argmax(y_pred_probs, axis=1)
 
     return y_pred, end_train - start_train, end_test - start_test
 
@@ -459,6 +456,4 @@ plt.xticks(rotation=45)
 
 plt.tight_layout()
 plt.show()
-
-
 
