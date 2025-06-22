@@ -145,7 +145,7 @@ print("Starting Neural Network")
 
 
 # monitor='val_loss', min_delta=1e-3, patience=5, verbose=1, mode='auto')
-history = nn_model.fit(x_train, y_train, validation_data=(x_test, y_test),  verbose=2, epochs=200, batch_size=1000)
+nn_model.fit(x_train, y_train)  # Updated to scikit-learn format
 
 
 # In[ ]:
