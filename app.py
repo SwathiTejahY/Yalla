@@ -1,3 +1,4 @@
+from sklearn.neural_network import MLPClassifier
 # coding: utf-8
 
 # In[ ]:
@@ -145,6 +146,7 @@ print("Starting Neural Network")
 
 
 # monitor='val_loss', min_delta=1e-3, patience=5, verbose=1, mode='auto')
+nn_model = MLPClassifier(hidden_layer_sizes=(50,), max_iter=500, random_state=42)
 nn_model.fit(x_train, y_train)  # Updated to scikit-learn format
 
 
@@ -443,5 +445,6 @@ plt.xticks(rotation=45)
 
 plt.tight_layout()
 plt.show()
+
 
 
