@@ -1,6 +1,20 @@
 from sklearn.neural_network import MLPClassifier
 # coding: utf-8
 
+
+import time
+
+def measure_time(model, x_train, y_train, x_test, y_test):
+    start_train = time.time()
+    model.fit(x_train, y_train)
+    train_time = time.time() - start_train
+
+    start_test = time.time()
+    y_pred = model.predict(x_test)
+    test_time = time.time() - start_test
+
+    return y_pred, train_time, test_time
+
 # In[ ]:
 
 
