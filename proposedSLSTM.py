@@ -13,15 +13,15 @@ uploaded_images = st.file_uploader(
     help="Upload all 7 PNG images named step1.png through step7.png"
 )
 
-# Expected order and filenames
+# Step-by-step descriptions and filenames
 steps = [
-    ("Step 1: Input Sequence → First LSTM Layer", "step1.png"),
-    ("Step 2: First LSTM → Second LSTM Layer", "step2.png"),
-    ("Step 3: Second LSTM → Dense Layers", "step3.png"),
-    ("Step 4: Dense Layers → Output Layer", "step4.png"),
-    ("Step 5: Forget Gate Logic", "step5.png"),
-    ("Step 6: Input Gate and Candidate Memory", "step6.png"),
-    ("Step 7: Output Gate and Final Hidden State", "step7.png"),
+    ("Step 1: Input Sequence → First LSTM Layer", "step1.png", "The input sequence is passed to the first LSTM layer, which begins the temporal processing of the sequence data."),
+    ("Step 2: First LSTM → Second LSTM Layer", "step2.png", "The first LSTM's output is passed to the second stacked LSTM layer for deeper sequence learning."),
+    ("Step 3: Second LSTM → Dense Layers", "step3.png", "Outputs from the second LSTM are connected to dense (fully connected) layers to map learned features to the output domain."),
+    ("Step 4: Dense Layers → Output Layer", "step4.png", "The final dense layer computes the network output, typically used for classification or regression."),
+    ("Step 5: Forget Gate Logic", "step5.png", "The forget gate controls which parts of the previous cell state should be retained or discarded using a sigmoid filter."),
+    ("Step 6: Input Gate and Candidate Memory", "step6.png", "The input gate updates memory content with new candidate values generated using tanh and filtered by a sigmoid gate."),
+    ("Step 7: Output Gate and Final Hidden State", "step7.png", "The output gate determines the final hidden state using the updated memory and sigmoid/tanh operations."),
 ]
 
 # Map images by filename
@@ -30,28 +30,16 @@ if uploaded_images:
     for img in uploaded_images:
         image_dict[img.name.lower()] = Image.open(img)
 
-# Animation
-if st.button("▶ Play SLSTM Animation"):
-    for title, filename in steps:
+# Animation all at once with explanations
+if st.button("▶ View Full SLSTM Animation"):
+    for title, filename, explanation in steps:
         st.subheader(title)
+        st.markdown(f"**Explanation:** {explanation}")
         if filename.lower() in image_dict:
             st.image(image_dict[filename.lower()], use_column_width=True)
-            time.sleep(2)
         else:
             st.error(f"❌ Missing image: {filename}")
         st.markdown("---")
 
-# Manual step viewer
-st.markdown("### 📚 View Slides Manually")
-selected_step = st.selectbox("Select Step", [title for title, _ in steps])
-for title, filename in steps:
-    if title == selected_step:
-        st.subheader(title)
-        if filename.lower() in image_dict:
-            st.image(image_dict[filename.lower()], use_column_width=True)
-        else:
-            st.warning(f"⚠️ '{filename}' not uploaded.")
-        break
-
 st.markdown("---")
-st.info("Upload all SLSTM step visuals, then play the animation or explore each step manually.")
+st.info("Upload all SLSTM step visuals (step1.png to step7.png) to view a complete architectural animation with step-by-step explanation.")
