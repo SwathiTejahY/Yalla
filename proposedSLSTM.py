@@ -2,7 +2,7 @@ import streamlit as st
 from PIL import Image
 import time
 
-st.set_page_config(layout="wide")
+st.set_page_config(layout="centered")
 st.title("📘 SLSTM Architecture - Animated Explanation")
 
 # Upload all 7 step images at once
@@ -30,6 +30,21 @@ if uploaded_images:
     for img in uploaded_images:
         image_dict[img.name.lower()] = Image.open(img)
 
+# Navigation control for single-step view
+st.markdown("## 🔄 Navigate SLSTM Steps")
+step_titles = [title for title, _, _ in steps]
+selected_step = st.selectbox("Choose Step to View", step_titles)
+
+for title, filename, explanation in steps:
+    if title == selected_step:
+        st.subheader(title)
+        st.markdown(f"**Explanation:** {explanation}")
+        if filename.lower() in image_dict:
+            st.image(image_dict[filename.lower()], use_column_width=True)
+        else:
+            st.error(f"❌ Missing image: {filename}")
+        break
+
 # Animation all at once with explanations
 if st.button("▶ View Full SLSTM Animation"):
     for title, filename, explanation in steps:
@@ -42,4 +57,4 @@ if st.button("▶ View Full SLSTM Animation"):
         st.markdown("---")
 
 st.markdown("---")
-st.info("Upload all SLSTM step visuals (step1.png to step7.png) to view a complete architectural animation with step-by-step explanation.")
+st.info("Upload all SLSTM step visuals (step1.png to step7.png) to view a complete architectural animation or navigate one step at a time.")
