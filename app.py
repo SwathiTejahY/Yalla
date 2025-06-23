@@ -16,7 +16,7 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 
-st.title("Compare ML Models on Tabular Data (No TensorFlow Required)")
+st.title("Comparison")
 
 train_file = st.file_uploader("Upload Training CSV", type="csv")
 test_file = st.file_uploader("Upload Testing CSV", type="csv")
@@ -55,7 +55,7 @@ def evaluate_model(name, y_true, y_pred, train_time, test_time):
 
 def simulate_slstm_fallback(x_train, y_train, x_test, y_test):
     model = MLPClassifier(
-        hidden_layer_sizes=(128, 64, 32),  # Simulates "deep" sequence-like learning
+        hidden_layer_sizes=(128, 64, 32),
         activation='relu',
         max_iter=300,
         random_state=42
@@ -91,37 +91,47 @@ if train_file and test_file:
     x_train_scaled = scaler.fit_transform(x_train)
     x_test_scaled = scaler.transform(x_test)
 
-    models = {
+    st.sidebar.header("Select Models to Compare")
+    model_options = {
         "Neural Network (MLPClassifier)": MLPClassifier(hidden_layer_sizes=(100,), max_iter=300, random_state=42),
         "Naive Bayes": GaussianNB(),
         "Decision Tree": DecisionTreeClassifier(random_state=42),
         "K-Nearest Neighbors": KNeighborsClassifier(n_neighbors=5),
-        "Linear Discriminant Analysis": LinearDiscriminantAnalysis()
+        "Linear Discriminant Analysis": LinearDiscriminantAnalysis(),
+        "SLSTM": "simulate_slstm"
+    }
+
+    selected_models = {
+        name: model for name, model in model_options.items()
+        if st.sidebar.checkbox(name, value=True)
     }
 
     results = []
 
     st.subheader("Training and Evaluation")
 
-    for name, model in models.items():
-        with st.spinner(f"Training {name}..."):
-            y_pred, train_time, test_time = measure_time(model, x_train_scaled, y_train, x_test_scaled, y_test)
-            result = evaluate_model(name, y_test, y_pred, train_time, test_time)
-            results.append(result)
-            st.success(f"{name} done! Accuracy: {result['Accuracy']:.4f}")
+    for name, model in selected_models.items():
+        if name == "SLSTM":
+            with st.spinner("Training SLSTM..."):
+                y_pred, train_time, test_time = simulate_slstm_fallback(
+                    x_train_scaled, y_train, x_test_scaled, y_test
+                )
+                results.append(evaluate_model("SLSTM", y_test, y_pred, train_time, test_time))
+                st.success("SLSTM done!")
+        else:
+            with st.spinner(f"Training {name}..."):
+                y_pred, train_time, test_time = measure_time(model, x_train_scaled, y_train, x_test_scaled, y_test)
+                results.append(evaluate_model(name, y_test, y_pred, train_time, test_time))
+                st.success(f"{name} done! Accuracy: {results[-1]['Accuracy']:.4f}")
 
-    # Add Simulated SLSTM
-    with st.spinner("Training simulated SLSTM (MLP fallback)..."):
-        y_pred_fallback, train_time, test_time = simulate_slstm_fallback(
-            x_train_scaled, y_train, x_test_scaled, y_test
-        )
-        results.append(evaluate_model("SLSTM (MLP Fallback)", y_test, y_pred_fallback, train_time, test_time))
-        st.success("Simulated SLSTM done!")
-
-    # Display results
+    # Display and download results
     results_df = pd.DataFrame(results)
     st.subheader("📊 Model Comparison Table")
     st.dataframe(results_df)
+
+    # Download button
+    csv = results_df.to_csv(index=False).encode('utf-8')
+    st.download_button("📥 Download Results as CSV", data=csv, file_name='model_results.csv', mime='text/csv')
 
     # Charts
     st.subheader("📈 Metrics Comparison Charts")
