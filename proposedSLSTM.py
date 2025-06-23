@@ -5,20 +5,15 @@ import time
 st.set_page_config(layout="wide")
 st.title("📘 SLSTM Architecture - Animated Explanation")
 
-# Upload images (step1.png to step7.png)
+# Upload all 7 step images at once
 uploaded_images = st.file_uploader(
-    "📂 Upload SLSTM Step Images (step1.png to step7.png)",
+    "📂 Upload All SLSTM Step Images (step1.png to step7.png)",
     type=["png"],
-    accept_multiple_files=True
+    accept_multiple_files=True,
+    help="Upload all 7 PNG images named step1.png through step7.png"
 )
 
-# Map uploaded images to filenames
-image_dict = {}
-if uploaded_images:
-    for img in uploaded_images:
-        image_dict[img.name] = Image.open(img)
-
-# Step descriptions with expected filenames
+# Expected order and filenames
 steps = [
     ("Step 1: Input Sequence → First LSTM Layer", "step1.png"),
     ("Step 2: First LSTM → Second LSTM Layer", "step2.png"),
@@ -29,28 +24,34 @@ steps = [
     ("Step 7: Output Gate and Final Hidden State", "step7.png"),
 ]
 
-# Animation playback
+# Map images by filename
+image_dict = {}
+if uploaded_images:
+    for img in uploaded_images:
+        image_dict[img.name.lower()] = Image.open(img)
+
+# Animation
 if st.button("▶ Play SLSTM Animation"):
     for title, filename in steps:
         st.subheader(title)
-        if filename in image_dict:
-            st.image(image_dict[filename], use_column_width=True)
+        if filename.lower() in image_dict:
+            st.image(image_dict[filename.lower()], use_column_width=True)
             time.sleep(2)
         else:
             st.error(f"❌ Missing image: {filename}")
         st.markdown("---")
 
-# Manual selection
+# Manual step viewer
 st.markdown("### 📚 View Slides Manually")
-selected_step = st.selectbox("Select Step to View", [title for title, _ in steps])
+selected_step = st.selectbox("Select Step", [title for title, _ in steps])
 for title, filename in steps:
     if title == selected_step:
         st.subheader(title)
-        if filename in image_dict:
-            st.image(image_dict[filename], use_column_width=True)
+        if filename.lower() in image_dict:
+            st.image(image_dict[filename.lower()], use_column_width=True)
         else:
-            st.warning("⚠️ Image not uploaded.")
+            st.warning(f"⚠️ '{filename}' not uploaded.")
         break
 
 st.markdown("---")
-st.info("This animation illustrates how SLSTM manages memory with forget, input, and output gates to generate a final prediction.")
+st.info("Upload all SLSTM step visuals, then play the animation or explore each step manually.")
