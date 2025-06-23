@@ -13,26 +13,25 @@ data = {
         "Naive Bayes",
         "Decision Tree",
         "K-Nearest Neighbors",
-        "Linear Discriminant Analysis",
-        "SLSTM"
+        "Linear Discriminant Analysis"
     ],
-    "Training Time (s)": [18.284866, 0.302774, 0.652905, 0.142416, 0.886611, 25.938],
-    "Testing Time (s)": [4.946178, 0.089319, 0.015780, 396.167002, 0.032304, 5.341],
-    "Accuracy (%)": [86.8929, 67.0863, 90.3122, 59.7613, 80.0564, 88.571],
-    "F1 Score (%)": [87.1373, 75.8161, 90.0899, 58.4157, 77.8011, 88.129],
-    "Precision (%)": [88.25, 72.44, 91.12, 60.78, 76.42, 87.65],
-    "Recall (%)": [85.94, 78.32, 89.74, 56.30, 79.92, 88.70]
+    "Training Time (s)": [18.284866, 0.302774, 0.652905, 0.142416, 0.886611],
+    "Testing Time (s)": [4.946178, 0.089319, 0.015780, 396.167002, 0.032304],
+    "Accuracy (%)": [86.8929, 67.0863, 90.3122, 59.7613, 80.0564],
+    "F1 Score (%)": [87.1373, 75.8161, 90.0899, 58.4157, 77.8011]
 }
 
 # Create DataFrame
 results_df = pd.DataFrame(data)
-float_cols = ["Accuracy (%)", "F1 Score (%)", "Precision (%)", "Recall (%)"]
+float_cols = ["Accuracy (%)", "F1 Score (%)"]
 results_df[float_cols] = results_df[float_cols].round(2)
 
 # Show table
 st.subheader("Performance Table")
 st.dataframe(
-    results_df.style.highlight_max(axis=0, subset=["Accuracy (%)"]).format("{:.2f}"),
+    results_df.style
+        .highlight_max(axis=0, subset=["Accuracy (%)"])
+        .format({col: "{:.2f}" for col in results_df.select_dtypes(include=['float']).columns}),
     use_container_width=True
 )
 
@@ -47,9 +46,9 @@ st.download_button("📥 Download Results as CSV", data=csv, file_name='model_pe
 
 # Charts
 st.subheader("📈 Metrics Comparison Charts")
-fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+fig, axes = plt.subplots(1, 2, figsize=(14, 5))
 
-for ax, metric in zip(axes.flatten(), float_cols):
+for ax, metric in zip(axes, float_cols):
     sns.barplot(data=results_df, x='Model', y=metric, ax=ax)
     ax.set_title(metric)
     ax.set_ylim(0, 100)
