@@ -38,7 +38,6 @@ results_df[float_cols] = results_df[float_cols].round(2)
 st.subheader("Performance Table")
 st.dataframe(
     results_df.style
-        .highlight_max(axis=0, subset=["Accuracy (%)"])
         .format({col: "{:.2f}" for col in results_df.select_dtypes(include=['float']).columns}),
     use_container_width=True
 )
@@ -55,9 +54,10 @@ st.download_button("📥 Download Results as CSV", data=csv, file_name='model_pe
 # Charts
 st.subheader("📈 Metrics Comparison Charts")
 fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+colors = sns.color_palette("Set2", n_colors=len(results_df))
 
 for ax, metric in zip(axes.flatten(), float_cols):
-    sns.barplot(data=results_df, x='Model', y=metric, ax=ax)
+    sns.barplot(data=results_df, x='Model', y=metric, ax=ax, palette=colors)
     ax.set_title(metric)
     ax.set_ylim(0, 100)
     ax.set_ylabel('%')
