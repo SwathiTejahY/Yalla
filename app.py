@@ -6,23 +6,30 @@ import seaborn as sns
 st.set_page_config(layout="wide")
 st.title("Model Performance Comparison")
 
-# Hardcoded model performance data
-data = {
-    "Model": [
-        "Neural Network",
-        "Naive Bayes",
-        "Decision Tree",
-        "K-Nearest Neighbors",
-        "Linear Discriminant Analysis"
-    ],
-    "Training Time (s)": [18.284866, 0.302774, 0.652905, 0.142416, 0.886611],
-    "Testing Time (s)": [4.946178, 0.089319, 0.015780, 396.167002, 0.032304],
-    "Accuracy (%)": [86.8929, 67.0863, 90.3122, 59.7613, 80.0564],
-    "F1 Score (%)": [87.1373, 75.8161, 90.0899, 58.4157, 77.8011]
-}
+# CSV file uploader
+uploaded_file = st.file_uploader("Upload CSV File with Model Performance Data", type=["csv"])
 
-# Create DataFrame
-results_df = pd.DataFrame(data)
+if uploaded_file:
+    results_df = pd.read_csv(uploaded_file)
+else:
+    # Fallback hardcoded model performance data including SLSTM
+    data = {
+        "Model": [
+            "Neural Network",
+            "Naive Bayes",
+            "Decision Tree",
+            "K-Nearest Neighbors",
+            "Linear Discriminant Analysis",
+            "SLSTM"
+        ],
+        "Training Time (s)": [18.284866, 0.302774, 0.652905, 0.142416, 0.886611, 25.938],
+        "Testing Time (s)": [4.946178, 0.089319, 0.015780, 396.167002, 0.032304, 5.341],
+        "Accuracy (%)": [86.8929, 67.0863, 90.3122, 59.7613, 80.0564, 88.571],
+        "F1 Score (%)": [87.1373, 75.8161, 90.0899, 58.4157, 77.8011, 88.129]
+    }
+    results_df = pd.DataFrame(data)
+
+# Process and display
 float_cols = ["Accuracy (%)", "F1 Score (%)"]
 results_df[float_cols] = results_df[float_cols].round(2)
 
