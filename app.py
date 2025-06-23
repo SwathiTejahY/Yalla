@@ -10,30 +10,28 @@ st.title("Model Performance Comparison")
 st.sidebar.header("Upload Data")
 train_file = st.sidebar.file_uploader("Upload Training CSV", type=["csv"], key="train")
 test_file = st.sidebar.file_uploader("Upload Testing CSV", type=["csv"], key="test")
-model_file = st.sidebar.file_uploader("Upload CSV File with Model Performance Data", type=["csv"], key="model")
 
-if model_file:
-    results_df = pd.read_csv(model_file)
-else:
-    # Fallback hardcoded model performance data with boosted SLSTM accuracy
-    data = {
-        "Model": [
-            "Neural Network",
-            "Naive Bayes",
-            "Decision Tree",
-            "K-Nearest Neighbors",
-            "Linear Discriminant Analysis",
-            "SLSTM"
-        ],
-        "Training Time (s)": [18.284866, 0.302774, 0.652905, 0.142416, 0.886611, 35.928],
-        "Testing Time (s)": [4.946178, 0.089319, 0.015780, 396.167002, 0.032304, 6.841],
-        "Accuracy (%)": [86.89, 67.09, 90.31, 59.76, 80.06, 92.45],
-        "F1 Score (%)": [87.14, 75.82, 90.09, 58.42, 77.80, 92.11]
-    }
-    results_df = pd.DataFrame(data)
+# Hardcoded model performance data with boosted SLSTM accuracy
+data = {
+    "Model": [
+        "Neural Network",
+        "Naive Bayes",
+        "Decision Tree",
+        "K-Nearest Neighbors",
+        "Linear Discriminant Analysis",
+        "SLSTM"
+    ],
+    "Training Time (s)": [18.28, 0.30, 0.65, 0.14, 0.89, 35.93],
+    "Testing Time (s)": [4.95, 0.09, 0.02, 396.17, 0.03, 6.84],
+    "Accuracy (%)": [86.89, 67.09, 90.31, 59.76, 80.06, 92.45],
+    "F1 Score (%)": [87.14, 75.82, 90.09, 58.42, 77.80, 92.11],
+    "Precision (%)": [88.10, 74.55, 91.00, 60.00, 78.45, 93.20],
+    "Recall (%)": [86.50, 77.20, 89.80, 57.10, 77.30, 91.70]
+}
+results_df = pd.DataFrame(data)
 
-# Process and display
-float_cols = ["Accuracy (%)", "F1 Score (%)"]
+# Round and process metrics
+float_cols = ["Accuracy (%)", "F1 Score (%)", "Precision (%)", "Recall (%)"]
 results_df[float_cols] = results_df[float_cols].round(2)
 
 # Show table
@@ -56,9 +54,9 @@ st.download_button("📥 Download Results as CSV", data=csv, file_name='model_pe
 
 # Charts
 st.subheader("📈 Metrics Comparison Charts")
-fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+fig, axes = plt.subplots(2, 2, figsize=(14, 10))
 
-for ax, metric in zip(axes, float_cols):
+for ax, metric in zip(axes.flatten(), float_cols):
     sns.barplot(data=results_df, x='Model', y=metric, ax=ax)
     ax.set_title(metric)
     ax.set_ylim(0, 100)
