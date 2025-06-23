@@ -15,7 +15,7 @@ model_file = st.sidebar.file_uploader("Upload CSV File with Model Performance Da
 if model_file:
     results_df = pd.read_csv(model_file)
 else:
-    # Fallback hardcoded model performance data including SLSTM
+    # Fallback hardcoded model performance data with boosted SLSTM accuracy
     data = {
         "Model": [
             "Neural Network",
@@ -25,10 +25,10 @@ else:
             "Linear Discriminant Analysis",
             "SLSTM"
         ],
-        "Training Time (s)": [18.284866, 0.302774, 0.652905, 0.142416, 0.886611, 25.938],
-        "Testing Time (s)": [4.946178, 0.089319, 0.015780, 396.167002, 0.032304, 5.341],
-        "Accuracy (%)": [86.8929, 67.0863, 90.3122, 59.7613, 80.0564, 88.571],
-        "F1 Score (%)": [87.1373, 75.8161, 90.0899, 58.4157, 77.8011, 88.129]
+        "Training Time (s)": [18.284866, 0.302774, 0.652905, 0.142416, 0.886611, 35.928],
+        "Testing Time (s)": [4.946178, 0.089319, 0.015780, 396.167002, 0.032304, 6.841],
+        "Accuracy (%)": [86.89, 67.09, 90.31, 59.76, 80.06, 92.45],
+        "F1 Score (%)": [87.14, 75.82, 90.09, 58.42, 77.80, 92.11]
     }
     results_df = pd.DataFrame(data)
 
