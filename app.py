@@ -121,15 +121,23 @@ if train_file and test_file:
         else:
             with st.spinner(f"Training {name}..."):
                 y_pred, train_time, test_time = measure_time(model, x_train_scaled, y_train, x_test_scaled, y_test)
-                results.append(evaluate_model(name, y_test, y_pred, train_time, test_time))
-                st.success(f"{name} done! Accuracy: {results[-1]['Accuracy']:.4f}")
+                result = evaluate_model(name, y_test, y_pred, train_time, test_time)
+                results.append(result)
+                st.success(f"{name} done! Accuracy: {result['Accuracy']:.4f}")
 
-    # Display and download results
+    # Results and formatting
     results_df = pd.DataFrame(results)
-    st.subheader("📊 Model Comparison Table")
-    st.dataframe(results_df)
+    float_cols = ['Accuracy', 'F1 Score', 'Precision', 'Recall']
+    results_df[float_cols] = results_df[float_cols].round(4)
 
-    # Download button
+    def highlight_best(s):
+        is_best = s == s.max()
+        return ['background-color: lightgreen' if v else '' for v in is_best]
+
+    st.subheader("📊 Model Comparison Table")
+    st.dataframe(results_df.style.apply(highlight_best, subset=['Accuracy']), use_container_width=True)
+
+    # CSV Export
     csv = results_df.to_csv(index=False).encode('utf-8')
     st.download_button("📥 Download Results as CSV", data=csv, file_name='model_results.csv', mime='text/csv')
 
