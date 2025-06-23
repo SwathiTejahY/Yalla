@@ -3,7 +3,7 @@ from PIL import Image
 import time
 
 st.set_page_config(layout="centered")
-st.title("📘 SLSTM Architecture - Animated Explanation")
+st.markdown("<h2 style='text-align: center; font-size: 24px;'>📘 SLSTM Architecture - Animated Explanation</h2>", unsafe_allow_html=True)
 
 # Upload all 7 step images at once
 uploaded_images = st.file_uploader(
@@ -30,31 +30,32 @@ if uploaded_images:
     for img in uploaded_images:
         image_dict[img.name.lower()] = Image.open(img)
 
+# Animated playback
+if st.button("▶ Play Full Animation Step-by-Step"):
+    for title, filename, explanation in steps:
+        st.markdown(f"<h4 style='font-size:18px;'>{title}</h4>", unsafe_allow_html=True)
+        st.markdown(f"<p style='font-size:14px;'><b>Explanation:</b> {explanation}</p>", unsafe_allow_html=True)
+        if filename.lower() in image_dict:
+            st.image(image_dict[filename.lower()], use_column_width=True)
+            time.sleep(2)
+        else:
+            st.error(f"❌ Missing image: {filename}")
+        st.markdown("---")
+
 # Navigation control for single-step view
-st.markdown("## 🔄 Navigate SLSTM Steps")
+st.markdown("<h4 style='font-size:18px;'>🔄 Navigate SLSTM Steps</h4>", unsafe_allow_html=True)
 step_titles = [title for title, _, _ in steps]
 selected_step = st.selectbox("Choose Step to View", step_titles)
 
 for title, filename, explanation in steps:
     if title == selected_step:
-        st.subheader(title)
-        st.markdown(f"**Explanation:** {explanation}")
+        st.markdown(f"<h4 style='font-size:18px;'>{title}</h4>", unsafe_allow_html=True)
+        st.markdown(f"<p style='font-size:14px;'><b>Explanation:</b> {explanation}</p>", unsafe_allow_html=True)
         if filename.lower() in image_dict:
             st.image(image_dict[filename.lower()], use_column_width=True)
         else:
             st.error(f"❌ Missing image: {filename}")
         break
 
-# Animation all at once with explanations
-if st.button("▶ View Full SLSTM Animation"):
-    for title, filename, explanation in steps:
-        st.subheader(title)
-        st.markdown(f"**Explanation:** {explanation}")
-        if filename.lower() in image_dict:
-            st.image(image_dict[filename.lower()], use_column_width=True)
-        else:
-            st.error(f"❌ Missing image: {filename}")
-        st.markdown("---")
-
 st.markdown("---")
-st.info("Upload all SLSTM step visuals (step1.png to step7.png) to view a complete architectural animation or navigate one step at a time.")
+st.markdown("<p style='font-size:13px;'>Upload all SLSTM step visuals (step1.png to step7.png) to view a complete architectural animation or navigate one step at a time.</p>", unsafe_allow_html=True)
