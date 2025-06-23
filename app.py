@@ -6,11 +6,14 @@ import seaborn as sns
 st.set_page_config(layout="wide")
 st.title("Model Performance Comparison")
 
-# CSV file uploader
-uploaded_file = st.file_uploader("Upload CSV File with Model Performance Data", type=["csv"])
+# CSV file uploaders
+st.sidebar.header("Upload Data")
+train_file = st.sidebar.file_uploader("Upload Training CSV", type=["csv"], key="train")
+test_file = st.sidebar.file_uploader("Upload Testing CSV", type=["csv"], key="test")
+model_file = st.sidebar.file_uploader("Upload CSV File with Model Performance Data", type=["csv"], key="model")
 
-if uploaded_file:
-    results_df = pd.read_csv(uploaded_file)
+if model_file:
+    results_df = pd.read_csv(model_file)
 else:
     # Fallback hardcoded model performance data including SLSTM
     data = {
@@ -65,3 +68,14 @@ for ax, metric in zip(axes, float_cols):
         ax.bar_label(container, fmt="%.2f%%", label_type="edge", padding=2)
 
 st.pyplot(fig)
+
+# Optionally display uploaded training/testing data
+if train_file:
+    st.subheader("📁 Training Data Preview")
+    train_df = pd.read_csv(train_file)
+    st.dataframe(train_df.head())
+
+if test_file:
+    st.subheader("📁 Testing Data Preview")
+    test_df = pd.read_csv(test_file)
+    st.dataframe(test_df.head())
