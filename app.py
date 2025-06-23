@@ -16,8 +16,12 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv1D, MaxPooling1D, LSTM, Dense
+from tensorflow.keras.optimizers import Adam
 
-st.title("Compare ML Models on Tabular Data")
+
+st.title("Compare ML Models on Tabular Data (with SLSTM)")
 
 train_file = st.file_uploader("Upload Training CSV", type="csv")
 test_file = st.file_uploader("Upload Testing CSV", type="csv")
@@ -30,18 +34,6 @@ def preprocess_data(df):
     return df
 
 
-def measure_time(model, x_train, y_train, x_test, y_test):
-    start_train = time.time()
-    model.fit(x_train, y_train)
-    train_time = time.time() - start_train
-
-    start_test = time.time()
-    y_pred = model.predict(x_test)
-    test_time = time.time() - start_test
-
-    return y_pred, train_time, test_time
-
-
 def evaluate_model(name, y_true, y_pred, train_time, test_time):
     return {
         'Model': name,
@@ -52,6 +44,31 @@ def evaluate_model(name, y_true, y_pred, train_time, test_time):
         'Training Time (s)': train_time,
         'Testing Time (s)': test_time
     }
+
+
+def run_slstm(x_train, y_train, x_test, y_test):
+    # Reshape for Conv1D + LSTM
+    x_train_r = x_train.reshape((x_train.shape[0], x_train.shape[1], 1))
+    x_test_r = x_test.reshape((x_test.shape[0], x_test.shape[1], 1))
+
+    model = Sequential()
+    model.add(Conv1D(64, 2, activation='relu', input_shape=(x_train.shape[1], 1)))
+    model.add(MaxPooling1D(2))
+    model.add(LSTM(50, return_sequences=True))
+    model.add(LSTM(50))
+    model.add(Dense(len(np.unique(y_train)), activation='softmax'))
+    model.compile(optimizer=Adam(), loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+
+    start_train = time.time()
+    model.fit(x_train_r, y_train, epochs=10, batch_size=32, verbose=0)
+    train_time = time.time() - start_train
+
+    start_test = time.time()
+    y_probs = model.predict(x_test_r)
+    y_pred = np.argmax(y_probs, axis=1)
+    test_time = time.time() - start_test
+
+    return y_pred, train_time, test_time
 
 
 if train_file and test_file:
@@ -74,6 +91,7 @@ if train_file and test_file:
     x_train_scaled = scaler.fit_transform(x_train)
     x_test_scaled = scaler.transform(x_test)
 
+    # Classic models
     models = {
         "Neural Network (MLPClassifier)": MLPClassifier(hidden_layer_sizes=(100,), max_iter=300, random_state=42),
         "Naive Bayes": GaussianNB(),
@@ -88,16 +106,29 @@ if train_file and test_file:
 
     for name, model in models.items():
         with st.spinner(f"Training {name}..."):
-            y_pred, train_time, test_time = measure_time(model, x_train_scaled, y_train, x_test_scaled, y_test)
-            result = evaluate_model(name, y_test, y_pred, train_time, test_time)
-            results.append(result)
-            st.success(f"{name} done! Accuracy: {result['Accuracy']:.4f}, F1 Score: {result['F1 Score']:.4f}")
+            start_train = time.time()
+            model.fit(x_train_scaled, y_train)
+            train_time = time.time() - start_train
 
+            start_test = time.time()
+            y_pred = model.predict(x_test_scaled)
+            test_time = time.time() - start_test
+
+            results.append(evaluate_model(name, y_test, y_pred, train_time, test_time))
+            st.success(f"{name} done! Accuracy: {accuracy_score(y_test, y_pred):.4f}")
+
+    # Add SLSTM
+    with st.spinner("Training SLSTM..."):
+        y_pred_slstm, train_time, test_time = run_slstm(x_train_scaled, y_train, x_test_scaled, y_test)
+        results.append(evaluate_model("SLSTM (Conv1D + LSTM)", y_test, y_pred_slstm, train_time, test_time))
+        st.success("SLSTM done!")
+
+    # Display results
     results_df = pd.DataFrame(results)
     st.subheader("📊 Model Comparison Table")
     st.dataframe(results_df)
 
-    # Plot results
+    # Charts
     st.subheader("📈 Metrics Comparison Charts")
     fig, axes = plt.subplots(2, 2, figsize=(14, 10))
 
