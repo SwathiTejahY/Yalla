@@ -1,12 +1,24 @@
 import streamlit as st
 from PIL import Image
 import time
-import os
 
 st.set_page_config(layout="wide")
 st.title("📘 SLSTM Architecture - Animated Explanation")
 
-# Step-by-step explanation paired with image filenames
+# Upload images (step1.png to step7.png)
+uploaded_images = st.file_uploader(
+    "📂 Upload SLSTM Step Images (step1.png to step7.png)",
+    type=["png"],
+    accept_multiple_files=True
+)
+
+# Map uploaded images to filenames
+image_dict = {}
+if uploaded_images:
+    for img in uploaded_images:
+        image_dict[img.name] = Image.open(img)
+
+# Step descriptions with expected filenames
 steps = [
     ("Step 1: Input Sequence → First LSTM Layer", "step1.png"),
     ("Step 2: First LSTM → Second LSTM Layer", "step2.png"),
@@ -17,28 +29,27 @@ steps = [
     ("Step 7: Output Gate and Final Hidden State", "step7.png"),
 ]
 
-# Add autoplay animation
+# Animation playback
 if st.button("▶ Play SLSTM Animation"):
     for title, filename in steps:
         st.subheader(title)
-        if os.path.exists(filename):
-            image = Image.open(filename)
-            st.image(image, use_column_width=True)
+        if filename in image_dict:
+            st.image(image_dict[filename], use_column_width=True)
             time.sleep(2)
         else:
-            st.error(f"Missing image file: {filename}")
+            st.error(f"❌ Missing image: {filename}")
         st.markdown("---")
 
-# Static view as fallback
+# Manual selection
 st.markdown("### 📚 View Slides Manually")
-selected_step = st.selectbox("Choose Step", options=[title for title, _ in steps])
+selected_step = st.selectbox("Select Step to View", [title for title, _ in steps])
 for title, filename in steps:
     if title == selected_step:
         st.subheader(title)
-        if os.path.exists(filename):
-            st.image(Image.open(filename), use_column_width=True)
+        if filename in image_dict:
+            st.image(image_dict[filename], use_column_width=True)
         else:
-            st.warning("Image not found.")
+            st.warning("⚠️ Image not uploaded.")
         break
 
 st.markdown("---")
