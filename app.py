@@ -1,5 +1,3 @@
-# app.py
-
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -44,10 +42,10 @@ def measure_time(model, x_train, y_train, x_test, y_test):
 def evaluate_model(name, y_true, y_pred, train_time, test_time):
     return {
         'Model': name,
-        'Accuracy': accuracy_score(y_true, y_pred),
-        'F1 Score': f1_score(y_true, y_pred, average='weighted'),
-        'Precision': precision_score(y_true, y_pred, average='weighted', zero_division=0),
-        'Recall': recall_score(y_true, y_pred, average='weighted', zero_division=0),
+        'Accuracy (%)': accuracy_score(y_true, y_pred) * 100,
+        'F1 Score (%)': f1_score(y_true, y_pred, average='weighted') * 100,
+        'Precision (%)': precision_score(y_true, y_pred, average='weighted', zero_division=0) * 100,
+        'Recall (%)': recall_score(y_true, y_pred, average='weighted', zero_division=0) * 100,
         'Training Time (s)': train_time,
         'Testing Time (s)': test_time
     }
@@ -123,21 +121,25 @@ if train_file and test_file:
                 y_pred, train_time, test_time = measure_time(model, x_train_scaled, y_train, x_test_scaled, y_test)
                 result = evaluate_model(name, y_test, y_pred, train_time, test_time)
                 results.append(result)
-                st.success(f"{name} done! Accuracy: {result['Accuracy']:.4f}")
+                st.success(f"{name} done! Accuracy: {result['Accuracy (%)']:.2f}%")
 
-    # Results and formatting
     results_df = pd.DataFrame(results)
-    float_cols = ['Accuracy', 'F1 Score', 'Precision', 'Recall']
-    results_df[float_cols] = results_df[float_cols].round(4)
+    float_cols = ['Accuracy (%)', 'F1 Score (%)', 'Precision (%)', 'Recall (%)']
+    results_df[float_cols] = results_df[float_cols].round(2)
 
     def highlight_best(s):
         is_best = s == s.max()
         return ['background-color: lightgreen' if v else '' for v in is_best]
 
     st.subheader("📊 Model Comparison Table")
-    st.dataframe(results_df.style.apply(highlight_best, subset=['Accuracy']), use_container_width=True)
+    st.dataframe(results_df.style.apply(highlight_best, subset=['Accuracy (%)']), use_container_width=True)
 
-    # CSV Export
+    # Display best model
+    best_model_row = results_df.loc[results_df['Accuracy (%)'].idxmax()]
+    st.markdown(f"### 🏆 Best Model: **{best_model_row['Model']}**")
+    st.markdown(f"**Accuracy:** {best_model_row['Accuracy (%)']:.2f}%")
+
+    # CSV export
     csv = results_df.to_csv(index=False).encode('utf-8')
     st.download_button("📥 Download Results as CSV", data=csv, file_name='model_results.csv', mime='text/csv')
 
@@ -145,20 +147,24 @@ if train_file and test_file:
     st.subheader("📈 Metrics Comparison Charts")
     fig, axes = plt.subplots(2, 2, figsize=(14, 10))
 
-    sns.barplot(data=results_df, x='Model', y='Accuracy', ax=axes[0, 0])
-    axes[0, 0].set_title("Accuracy")
+    sns.barplot(data=results_df, x='Model', y='Accuracy (%)', ax=axes[0, 0])
+    axes[0, 0].set_title("Accuracy (%)")
+    axes[0, 0].set_ylim(0, 100)
     axes[0, 0].tick_params(axis='x', rotation=45)
 
-    sns.barplot(data=results_df, x='Model', y='F1 Score', ax=axes[0, 1])
-    axes[0, 1].set_title("F1 Score")
+    sns.barplot(data=results_df, x='Model', y='F1 Score (%)', ax=axes[0, 1])
+    axes[0, 1].set_title("F1 Score (%)")
+    axes[0, 1].set_ylim(0, 100)
     axes[0, 1].tick_params(axis='x', rotation=45)
 
-    sns.barplot(data=results_df, x='Model', y='Precision', ax=axes[1, 0])
-    axes[1, 0].set_title("Precision")
+    sns.barplot(data=results_df, x='Model', y='Precision (%)', ax=axes[1, 0])
+    axes[1, 0].set_title("Precision (%)")
+    axes[1, 0].set_ylim(0, 100)
     axes[1, 0].tick_params(axis='x', rotation=45)
 
-    sns.barplot(data=results_df, x='Model', y='Recall', ax=axes[1, 1])
-    axes[1, 1].set_title("Recall")
+    sns.barplot(data=results_df, x='Model', y='Recall (%)', ax=axes[1, 1])
+    axes[1, 1].set_title("Recall (%)")
+    axes[1, 1].set_ylim(0, 100)
     axes[1, 1].tick_params(axis='x', rotation=45)
 
     st.pyplot(fig)
