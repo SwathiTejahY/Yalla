@@ -14,7 +14,7 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.neural_network import MLPClassifier
 
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import accuracy_score, f1_score
+from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 
 
 st.title("Compare ML Models on Tabular Data")
@@ -43,12 +43,12 @@ def measure_time(model, x_train, y_train, x_test, y_test):
 
 
 def evaluate_model(name, y_true, y_pred, train_time, test_time):
-    acc = accuracy_score(y_true, y_pred)
-    f1 = f1_score(y_true, y_pred, average='weighted')
     return {
         'Model': name,
-        'Accuracy': acc,
-        'F1 Score': f1,
+        'Accuracy': accuracy_score(y_true, y_pred),
+        'F1 Score': f1_score(y_true, y_pred, average='weighted'),
+        'Precision': precision_score(y_true, y_pred, average='weighted', zero_division=0),
+        'Recall': recall_score(y_true, y_pred, average='weighted', zero_division=0),
         'Training Time (s)': train_time,
         'Testing Time (s)': test_time
     }
@@ -98,14 +98,23 @@ if train_file and test_file:
     st.dataframe(results_df)
 
     # Plot results
-    st.subheader("📈 Accuracy and F1 Score Chart")
-    fig, ax = plt.subplots(1, 2, figsize=(14, 5))
-    sns.barplot(data=results_df, x='Model', y='Accuracy', ax=ax[0])
-    ax[0].set_title("Accuracy")
-    ax[0].tick_params(axis='x', rotation=45)
+    st.subheader("📈 Metrics Comparison Charts")
+    fig, axes = plt.subplots(2, 2, figsize=(14, 10))
 
-    sns.barplot(data=results_df, x='Model', y='F1 Score', ax=ax[1])
-    ax[1].set_title("F1 Score")
-    ax[1].tick_params(axis='x', rotation=45)
+    sns.barplot(data=results_df, x='Model', y='Accuracy', ax=axes[0, 0])
+    axes[0, 0].set_title("Accuracy")
+    axes[0, 0].tick_params(axis='x', rotation=45)
+
+    sns.barplot(data=results_df, x='Model', y='F1 Score', ax=axes[0, 1])
+    axes[0, 1].set_title("F1 Score")
+    axes[0, 1].tick_params(axis='x', rotation=45)
+
+    sns.barplot(data=results_df, x='Model', y='Precision', ax=axes[1, 0])
+    axes[1, 0].set_title("Precision")
+    axes[1, 0].tick_params(axis='x', rotation=45)
+
+    sns.barplot(data=results_df, x='Model', y='Recall', ax=axes[1, 1])
+    axes[1, 1].set_title("Recall")
+    axes[1, 1].tick_params(axis='x', rotation=45)
 
     st.pyplot(fig)
